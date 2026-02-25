@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../features/main_navigation/presentation/main_navigation_page.dart';
+import '../../features/main_navigation/pages/main_navigation_page.dart';
 
 class AppRoutes {
   AppRoutes._();
