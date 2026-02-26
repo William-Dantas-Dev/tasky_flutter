@@ -5,50 +5,53 @@ import '../models/task_model.dart';
 
 const _tasksKey = 'tasks_list_v1';
 
-final tasksProvider = NotifierProvider<TasksNotifier, List<TaskModel>>(
+final tasksProvider = AsyncNotifierProvider<TasksNotifier, List<TaskModel>>(
   TasksNotifier.new,
 );
 
-class TasksNotifier extends Notifier<List<TaskModel>> {
+class TasksNotifier extends AsyncNotifier<List<TaskModel>> {
   @override
-  List<TaskModel> build() {
-    _load();
-    return [];
-  }
-
-  Future<void> _load() async {
+  Future<List<TaskModel>> build() async {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString(_tasksKey);
 
-    if (raw == null) return;
+    if (raw == null) return [];
 
     final decoded = jsonDecode(raw) as List;
-    state = decoded
+    return decoded
         .map((e) => TaskModel.fromMap(Map<String, dynamic>.from(e)))
         .toList();
   }
 
-  Future<void> _save() async {
+  Future<void> _save(List<TaskModel> list) async {
     final prefs = await SharedPreferences.getInstance();
-    final list = state.map((t) => t.toMap()).toList();
-    await prefs.setString(_tasksKey, jsonEncode(list));
+    await prefs.setString(
+      _tasksKey,
+      jsonEncode(list.map((t) => t.toMap()).toList()),
+    );
   }
 
   Future<void> addTask(TaskModel task) async {
-    state = [...state, task];
-    await _save();
+    final current = await future; // pega a lista atual (carregada)
+    final next = [...current, task];
+    state = AsyncValue.data(next);
+    await _save(next);
   }
 
   Future<void> toggleDone(String id) async {
-    state = [
-      for (final t in state)
+    final current = await future;
+    final next = [
+      for (final t in current)
         if (t.id == id) t.toggleDone() else t,
     ];
-    await _save();
+    state = AsyncValue.data(next);
+    await _save(next);
   }
 
   Future<void> removeTask(String id) async {
-    state = state.where((t) => t.id != id).toList();
-    await _save();
+    final current = await future;
+    final next = current.where((t) => t.id != id).toList();
+    state = AsyncValue.data(next);
+    await _save(next);
   }
 }

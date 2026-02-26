@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tasky_app/features/home/pages/home_page.dart';
 import '../providers/navigation_provider.dart';
 
 class MainNavigationPage extends ConsumerWidget {
@@ -13,7 +14,7 @@ class MainNavigationPage extends ConsumerWidget {
       body: IndexedStack(
         index: currentIndex,
         children: const [
-          TestPage(title: 'Home'),
+          HomePage(),
           TestPage(title: 'Calendário'),
           TestPage(title: 'Foco'),
           TestPage(title: 'Perfil'),

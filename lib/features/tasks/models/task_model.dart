@@ -5,7 +5,7 @@ enum TaskPriority { low, medium, high }
 class TaskModel {
   final String id;
   final String name;
-  final DateTime? time; // horário do alarme
+  final DateTime? time;
   final TaskFrequency frequency;
 
   /// 1 = segunda ... 7 = domingo
